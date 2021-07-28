@@ -1,0 +1,75 @@
+SQL_QUERY ::= SELECT_QUERY | INSERT_QUERY | UPDATE_QUERY | DELETE_QUERY | CREATE_QUERY | DROP_QUERY;
+
+(* ------------------------------------------------------------------- *)
+SELECT_QUERY ::= "SELECT" FIELD_LIST "FROM" TABLE_NAME WHERE_CLAUSE;
+
+FIELD_LIST ::= FIELD_NAME {"," FIELD_NAME} | "*";
+
+TABLE_NAME ::= NAME;
+
+FIELD_NAME ::= NAME;
+
+NAME ::= C_IDENTIFIER; (*what is C_IDENTIFIER??!?*)
+
+(* ------------------------------------------------------------------- *)
+
+INSERT_QUERY ::= "INSERT INTO" TABLE_NAME '('FIELD_VALUE { "," FIELD_VALUE}')';
+
+FIELD_VALUE ::= STRING | LONG;
+
+STRING ::= "'" SYMBOL {SYMBOL}"'";
+
+SYMBOL ::= ; (*literally anything except the apostrophe*)
+
+(* ------------------------------------------------------------------- *)
+
+UPDATE_QUERY ::= "UPDATE" TABLE_NAME "SET" FIELD_NAME = EXPR WHERE_CLAUSE;
+
+(* ------------------------------------------------------------------- *)
+
+DELETE_QUERY ::= "DELETE FROM" TABLE_NAME WHERE_CLAUSE;
+
+(* ------------------------------------------------------------------- *)
+
+CREATE_QUERY ::= "CREATE TABLE" TABLE_NAME "(" FIELD_DESCR_LIST ")";
+
+FIELD_DESCR_LIST ::= FIELD_DESCR { "," FIELD_DESCR};
+
+FIELD_DESCR ::= FIELD_NAME FIELD_TYPE;
+
+FIELD_TYPE ::= "TEXT" "(" LONG ")" | "LONG";
+
+(* ------------------------------------------------------------------- *)
+
+DROP_QUERY ::= "DROP TABLE" TABLE_NAME;
+
+(* ------------------------------------------------------------------- *)
+
+* WHERE_CLAUSE ::= "WHERE" TEXT_FIELD_NAME [not] like STRING_SAMPLE |
+* 				"where" EXPRESSION [not] in "("VALUE_LIST")" |
+* 				"where" BOOL_EXPRESSION |
+* 				"where" "all";
+* STRING_SAMPLE ::= string;
+* EXPRESSION ::= LONG_EXPRESSION | TEXT_EXPRESSION
+*
+* TEXT_FIELD_NAME ::= ident;
+* VALUE_LIST ::= string {, string} | number {, number};
+*
+* LONG_EXPRESSION -> LONG_ADD {SIGN_ADD LONG_ADD}
+* SIGN_ADD -> + | -
+* LONG_ADD -> LONG_MULT {SIGN_MULT LONG_MULT}
+* SIGN_MULT -> * | / | %
+* LONG_MULT -> LONG_VALUE | (LONG_EXPRESSION)
+* LONG_VALUE -> LONG_FIELD_NAME | number
+* LONG_FIELD_NAME -> ident
+*
+* TEXT_EXPRESSION -> TEXT_FIELD_NAME | string
+* TEXT_FIELD_NAME -> ident
+*
+* BOOL_EXPRESSION -> BOOL_ADD {or BOOL_ADD}
+* BOOL_ADD -> BOOL_MULT {and BOOL_MULT}
+* BOOL_MULT -> not BOOL_MULT | (BOOL_EXPRESSION) | (COMPARISON)
+* COMPARISON -> TEXT_COMPARISON | LONG_COMPARISON
+* TEXT_COMPARISON -> TEXT_EXPRESSION SIGN_COMP TEXT_EXPRESSION
+* LONG_COMPARISON -> LONG_EXPRESSION SIGN_COMP LONG_EXPRESSION
+* SIGN_COMP -> = | != | < | > | <= | >=
